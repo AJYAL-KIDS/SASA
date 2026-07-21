@@ -37,18 +37,109 @@
     const searchInput=$('#searchInput');
     $('#searchToggle').onclick=()=>{searchPanel.classList.add('open');setTimeout(()=>searchInput.focus(),300)};
     $('#closeSearch').onclick=()=>searchPanel.classList.remove('open');
-    document.addEventListener('keydown',e=>{
-        if(e.key==='Escape'){searchPanel.classList.remove('open');mobileNav.classList.remove('open');overlay.classList.remove('show');closeCartFn();$('#modalOverlay').classList.remove('show');authOverlay.classList.remove('show');adminOverlay.classList.remove('show');$('#productModal').classList.remove('show')}
-    });
+
+    // ARABIC TO ENGLISH
+    function arToEn(s){return s.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))}
+
+    // ===== PRODUCTS STORAGE =====
+    const LS_KEY='sasa_products';
+    const catMap={baby:'مواليد · ',toddler:'صغار · ',kids:'أطفال · ',junior:'كبار · '};
+    const catLabels={baby:'مواليد',toddler:'صغار',kids:'أطفال',junior:'كبار'};
+    const genderLabels={boys:'ولاد',girls:'بنات'};
+    const bgColors={baby:'#fef3e2',toddler:'#e3f2fd',kids:'#fce4ec',junior:'#e8eaf6',default:'#f2f2f2'};
+    const shapeMap={baby:'baby-shape',toddler:'toddler-shape',kids:'kids-shape',junior:'junior-shape'};
+
+    function getDefaultProducts(){
+        return [
+            {name:'طقم تيشيرت وشورت',cat:'baby',gender:'girls',price:'٢٥٠ ج.م',oldPrice:'٣٥٠ ج.م',image:'',tags:'baby girls'},
+            {name:'سويت شيرت كامل',cat:'toddler',gender:'boys',price:'٣٨٠ ج.م',oldPrice:'',image:'',tags:'toddler boys'},
+            {name:'فستان كاجوال',cat:'kids',gender:'girls',price:'٤٢٠ ج.م',oldPrice:'',image:'',tags:'kids girls'},
+            {name:'طقم تيشيرت وبنطلون رياضي',cat:'kids',gender:'boys',price:'٣٥٠ ج.م',oldPrice:'٤٥٠ ج.م',image:'',tags:'kids boys'},
+            {name:'بليزر كاجوال',cat:'junior',gender:'boys',price:'٥٥٠ ج.م',oldPrice:'',image:'',tags:'junior boys'},
+            {name:'هودي أوفررايزد',cat:'junior',gender:'girls',price:'٤٨٠ ج.م',oldPrice:'',image:'',tags:'junior girls'},
+            {name:'بيجامة قطن مطبوعة',cat:'baby',gender:'boys',price:'١٨٠ ج.م',oldPrice:'',image:'',tags:'baby boys'},
+            {name:'طقم فستان وبادي',cat:'toddler',gender:'girls',price:'٣٢٠ ج.م',oldPrice:'٤٢٠ ج.م',image:'',tags:'toddler girls'}
+        ];
+    }
+
+    function loadProducts(){
+        try{
+            const stored=localStorage.getItem(LS_KEY);
+            if(stored)return JSON.parse(stored);
+        }catch(e){}
+        return getDefaultProducts();
+    }
+
+    function saveProducts(){
+        const grid=$('#productsGrid');
+        const products=[];
+        grid.querySelectorAll('.product').forEach(p=>{
+            const name=p.querySelector('h4').textContent;
+            const catText=p.querySelector('.product-cat').textContent;
+            const price=p.querySelector('.price').textContent;
+            const oldEl=p.querySelector('.old');
+            const oldPrice=oldEl?oldEl.textContent:'';
+            const imgEl=p.querySelector('.product-img');
+            const image=imgEl?imgEl.dataset.img||'':'';
+            const tags=p.dataset.tags||'';
+            let cat='kids',gender='boys';
+            ['baby','toddler','kids','junior'].forEach(c=>{if(tags.includes(c))cat=c});
+            ['boys','girls'].forEach(g=>{if(tags.includes(g))gender=g});
+            products.push({name,cat,gender,price,oldPrice,image,tags});
+        });
+        try{localStorage.setItem(LS_KEY,JSON.stringify(products))}catch(e){}
+    }
+
+    function buildProductCard(p){
+        const bg=bgColors[p.cat]||bgColors.default;
+        const shape=shapeMap[p.cat]||'kids-shape';
+        const article=document.createElement('article');
+        article.className='product';
+        article.dataset.tags=p.cat+' '+p.gender;
+        let imgHTML='';
+        if(p.image){imgHTML='<img src="'+p.image+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">'}
+        else{imgHTML='<div class="product-shape '+shape+'"></div>'}
+        let oldHTML=p.oldPrice?'<span class="old">'+p.oldPrice+'</span>':'';
+        article.innerHTML='<div class="product-img" style="background:'+bg+';" data-img="'+(p.image||'')+'">'+imgHTML+'<button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button></div><div class="product-body"><span class="product-cat">'+(catMap[p.cat]||'')+genderLabels[p.gender]+'</span><h4>'+p.name+'</h4><div class="price-row"><span class="price">'+p.price+'</span>'+oldHTML+'</div><div class="product-actions"><button class="btn-add-cart">أضف للسلة</button><button class="btn-buy-now">اشتري الآن</button></div></div>';
+        return article;
+    }
+
+    function renderAllProducts(){
+        const grid=$('#productsGrid');
+        grid.innerHTML='';
+        const stored=loadProducts();
+        stored.forEach(p=>{
+            const card=buildProductCard(p);
+            grid.appendChild(card);
+            attachProductEvents(card);
+        });
+        attachFilterEvents();
+    }
+
+    function attachProductEvents(card){
+        card.querySelector('.btn-add-cart').addEventListener('click',e=>{e.preventDefault();openModal(card,false)});
+        card.querySelector('.btn-buy-now').addEventListener('click',e=>{e.preventDefault();openModal(card,true)});
+        card.querySelector('.fav-btn').addEventListener('click',e=>{
+            e.preventDefault();e.stopPropagation();
+            card.querySelector('.fav-btn').classList.toggle('active');
+            toast(card.querySelector('.fav-btn').classList.contains('active')?'تمت الإضافة للمفضلة ♥':'تمت الإزالة من المفضلة');
+        });
+    }
 
     // FILTER
-    const pills=$$('.pill');
-    const products=$$('.product');
+    let activeFilter='all';
+    function attachFilterEvents(){
+        $$('.pill').forEach(pill=>{
+            pill.onclick=()=>filterProducts(pill.dataset.filter);
+        });
+    }
+
     function filterProducts(f){
-        pills.forEach(p=>p.classList.remove('active'));
-        const match=[...pills].find(p=>p.dataset.filter===f);
+        activeFilter=f;
+        $$('.pill').forEach(p=>p.classList.remove('active'));
+        const match=[...$$('.pill')].find(p=>p.dataset.filter===f);
         if(match)match.classList.add('active');
-        products.forEach(p=>{
+        $$('.product').forEach(p=>{
             const tags=p.dataset.tags||'';
             if(f==='all'||tags.includes(f)){
                 p.classList.remove('hidden');
@@ -58,30 +149,25 @@
             }
         });
     }
-    pills.forEach(pill=>{
-        pill.addEventListener('click',()=>filterProducts(pill.dataset.filter));
-    });
 
     // AGE CARDS -> FILTER PRODUCTS
     $$('.age-card').forEach(card=>{
         card.addEventListener('click',e=>{
             e.preventDefault();
-            const age=card.dataset.age;
-            filterProducts(age);
+            filterProducts(card.dataset.age);
             const target=$('#productsGrid');
-            if(target){
-                target.scrollIntoView({behavior:'smooth',block:'start'});
-            }
+            if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
         });
     });
 
     // WISHLIST
-    $$('.fav-btn').forEach(btn=>{
-        btn.addEventListener('click',e=>{
+    document.addEventListener('click',e=>{
+        const fav=e.target.closest('.fav-btn');
+        if(fav){
             e.preventDefault();e.stopPropagation();
-            btn.classList.toggle('active');
-            toast(btn.classList.contains('active')?'تمت الإضافة للمفضلة ♥':'تمت الإزالة من المفضلة');
-        });
+            fav.classList.toggle('active');
+            toast(fav.classList.contains('active')?'تمت الإضافة للمفضلة ♥':'تمت الإزالة من المفضلة');
+        }
     });
 
     // CART
@@ -95,15 +181,11 @@
     function openCart(){cartPanel.classList.add('open');cartOverlay.classList.add('show')}
     function closeCartFn(){cartPanel.classList.remove('open');cartOverlay.classList.remove('show')}
 
-    const cartTriggers=$$('.cart-trigger');
-    cartTriggers.forEach(t=>t.addEventListener('click',e=>{e.preventDefault();openCart()}));
+    $$('.cart-trigger').forEach(t=>t.addEventListener('click',e=>{e.preventDefault();openCart()}));
     $('#closeCart').addEventListener('click',closeCartFn);
     cartOverlay.addEventListener('click',closeCartFn);
     $('#continueShopping').addEventListener('click',e=>{e.preventDefault();closeCartFn()});
 
-    function arToEn(s){
-        return s.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
-    }
     function recalcCart(){
         const items=cartItems.querySelectorAll('.cart-item');
         let total=0,qty=0;
@@ -139,7 +221,7 @@
         if(rm){
             const item=rm.closest('.cart-item');
             item.style.opacity='0';item.style.transform='translateX(40px)';item.style.transition='all .3s';
-            setTimeout(()=>{item.remove();recalcCart();if(!cartItems.querySelector('.cart-item')){cartEmpty.classList.add('show');cartFooter.style.display='none'}},300);
+            setTimeout(()=>{item.remove();recalcCart()},300);
             toast('تمت الإزالة من السلة');
         }
     });
@@ -179,8 +261,8 @@
                 msg+='   الكمية: 1\n';
                 msg+='   السعر: '+priceText+'\n\n';
                 msg+='━━━━━━━━━━━━━━━━━━━━\n';
-                const price=parseInt(priceText.replace(/[^\d]/g,''));
-                msg+='*الإجمالي: '+price.toLocaleString('ar-EG')+' ج.م*\n';
+                const price=parseInt(arToEn(priceText).replace(/[^\d]/g,''));
+                msg+='*الإجمالي: '+(isNaN(price)?0:price).toLocaleString('ar-EG')+' ج.م*\n';
                 msg+='━━━━━━━━━━━━━━━━━━━━\n';
                 msg+='\nشكراً لك! 🙏';
                 window.open('https://wa.me/201500351338?text='+encodeURIComponent(msg),'_blank');
@@ -201,29 +283,13 @@
             }else{
                 cartEmpty.classList.remove('show');
                 cartFooter.style.display='';
-                const bgColors=['#fef3e2','#e3f2fd','#fce4ec','#e8f5e9'];
-                const shapes=['baby-shape','toddler-shape','kids-shape','junior-shape'];
-                const c=bgColors[Math.floor(Math.random()*bgColors.length)];
-                const sh=shapes[Math.floor(Math.random()*shapes.length)];
+                const bgC=['#fef3e2','#e3f2fd','#fce4ec','#e8f5e9'];
+                const shC=['baby-shape','toddler-shape','kids-shape','junior-shape'];
+                const c=bgC[Math.floor(Math.random()*bgC.length)];
+                const sh=shC[Math.floor(Math.random()*shC.length)];
                 const div=document.createElement('div');
                 div.className='cart-item';
-                div.innerHTML=`
-                    <div class="cart-item-img" style="background:${c}"><div class="product-shape ${sh}"></div></div>
-                    <div class="cart-item-info">
-                        <h4>${name}</h4>
-                        <span class="cart-item-cat">${cat}</span>
-                        <div class="cart-item-size">المقاس: <strong>${sz}</strong></div>
-                        <div class="cart-item-color">اللون: <strong>${cl}</strong></div>
-                        <div class="cart-item-bottom">
-                            <div class="qty-control">
-                                <button class="qty-btn minus">−</button>
-                                <span class="qty-num">1</span>
-                                <button class="qty-btn plus">+</button>
-                            </div>
-                            <span class="cart-item-price">${priceText}</span>
-                        </div>
-                    </div>
-                    <button class="remove-item" aria-label="حذف"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+                div.innerHTML='<div class="cart-item-img" style="background:'+c+'"><div class="product-shape '+sh+'"></div></div><div class="cart-item-info"><h4>'+name+'</h4><span class="cart-item-cat">'+cat+'</span><div class="cart-item-size">المقاس: <strong>'+sz+'</strong></div><div class="cart-item-color">اللون: <strong>'+cl+'</strong></div><div class="cart-item-bottom"><div class="qty-control"><button class="qty-btn minus">−</button><span class="qty-num">1</span><button class="qty-btn plus">+</button></div><span class="cart-item-price">'+priceText+'</span></div></div><button class="remove-item" aria-label="حذف"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
                 cartItems.prepend(div);
             }
             recalcCart();
@@ -234,18 +300,15 @@
         $('#modalOverlay').classList.add('show');
     }
 
-    $$('.btn-add-cart').forEach(btn=>{
-        btn.addEventListener('click',e=>{
+    document.addEventListener('click',e=>{
+        if(e.target.closest('.btn-add-cart')){
             e.preventDefault();
-            openModal(btn.closest('.product'),false);
-        });
-    });
-
-    $$('.btn-buy-now').forEach(btn=>{
-        btn.addEventListener('click',e=>{
+            openModal(e.target.closest('.product'),false);
+        }
+        if(e.target.closest('.btn-buy-now')){
             e.preventDefault();
-            openModal(btn.closest('.product'),true);
-        });
+            openModal(e.target.closest('.product'),true);
+        }
     });
 
     $('#modalClose').addEventListener('click',()=>$('#modalOverlay').classList.remove('show'));
@@ -256,7 +319,7 @@
     // CHECKOUT VIA WHATSAPP
     $('#checkoutBtn').addEventListener('click',()=>{
         const items=cartItems.querySelectorAll('.cart-item');
-        if(!items.length){return}
+        if(!items.length)return;
         let msg='*طلب جديد من SASA - اجيال كيدز* 🛒\n━━━━━━━━━━━━━━━━━━━━\n\n';
         let total=0;
         items.forEach((item,i)=>{
@@ -280,11 +343,10 @@
         msg+='*الإجمالي: '+total.toLocaleString('ar-EG')+' ج.م*\n';
         msg+='━━━━━━━━━━━━━━━━━━━━\n';
         msg+='\nشكراً لك! 🙏';
-        const encoded=encodeURIComponent(msg);
-        window.open('https://wa.me/201500351338?text='+encoded,'_blank');
+        window.open('https://wa.me/201500351338?text='+encodeURIComponent(msg),'_blank');
     });
 
-    // CONTACT US - WhatsApp with products & offers
+    // CONTACT US
     function openContactWA(){
         let msg='*مرحبًا! أنا مهتم بمنتجات SASA - اجيال كيدز* 👋\n━━━━━━━━━━━━━━━━━━━━\n\n';
         msg+='*🛒 المنتجات المتاحة:*\n\n';
@@ -325,18 +387,35 @@
         });
     },{threshold:.08,rootMargin:'0px 0px -40px 0px'});
 
-    $$('.age-card,.product,.feat,.banner-box,.nl-box').forEach((el,i)=>{
-        el.style.opacity='0';
-        el.style.transform='translateY(24px)';
-        el.style.transition=`opacity .6s ease ${i*0.05}s,transform .6s ease ${i*0.05}s`;
-        obs.observe(el);
+    function observeElements(){
+        $$('.age-card,.product,.feat,.banner-box,.nl-box').forEach((el,i)=>{
+            el.style.opacity='0';
+            el.style.transform='translateY(24px)';
+            el.style.transition='opacity .6s ease '+i*0.05+'s,transform .6s ease '+i*0.05+'s';
+            obs.observe(el);
+        });
+    }
+
+    // ===== ADMIN =====
+    const authOverlay=$('#authOverlay');
+    const adminOverlay=$('#adminOverlay');
+
+    $('#loginToggle').addEventListener('click',()=>authOverlay.classList.add('show'));
+    $('#authClose').addEventListener('click',()=>authOverlay.classList.remove('show'));
+    authOverlay.addEventListener('click',e=>{if(e.target===authOverlay)authOverlay.classList.remove('show')});
+
+    $$('.auth-tab').forEach(tab=>{
+        tab.addEventListener('click',()=>{
+            $$('.auth-tab').forEach(t=>t.classList.remove('active'));
+            tab.classList.add('active');
+            const t=tab.dataset.tab;
+            $('#loginForm').classList.toggle('hidden',t!=='login');
+            $('#registerForm').classList.toggle('hidden',t!=='register');
+        });
     });
 
-    // ADMIN PRODUCTS
-    let editingIdx=null;
     let currentAdminFilter='all';
-    const catMap={baby:'مواليد · ',toddler:'صغار · ',kids:'أطفال · ',junior:'كبار · '};
-    const tagMap={baby:'baby',toddler:'toddler',kids:'kids',junior:'junior'};
+    let editingIdx=null;
 
     function renderAdminProducts(filter){
         currentAdminFilter=filter;
@@ -364,7 +443,13 @@
                 const target=all[idx];
                 if(target){
                     target.style.opacity='0';target.style.transform='scale(.9)';target.style.transition='all .3s';
-                    setTimeout(()=>{target.remove();renderAdminProducts(currentAdminFilter);$('#statProducts').textContent=$$('.product').length;toast('تم حذف المنتج')},300);
+                    setTimeout(()=>{
+                        target.remove();
+                        saveProducts();
+                        renderAdminProducts(currentAdminFilter);
+                        $('#statProducts').textContent=$$('.product').length;
+                        toast('تم حذف المنتج');
+                    },300);
                 }
             });
         });
@@ -377,137 +462,16 @@
                 $('#productModalTitle').textContent='تعديل المنتج';
                 $('#pfSubmit').textContent='حفظ التعديلات';
                 $('#pfName').value=p.querySelector('h4').textContent;
-                const catText=p.querySelector('.product-cat').textContent;
                 const priceText=p.querySelector('.price').textContent;
                 $('#pfPrice').value=priceText;
                 const oldEl=p.querySelector('.old');
                 $('#pfOldPrice').value=oldEl?oldEl.textContent:'';
                 const imgEl=p.querySelector('.product-img');
-                $('#pfImage').value=imgEl.dataset.img||'';
+                $('#pfImage').value=imgEl?imgEl.dataset.img||'':'';
                 const tags=p.dataset.tags||'';
                 ['baby','toddler','kids','junior'].forEach(c=>{if(tags.includes(c))$('#pfCategory').value=c});
                 ['boys','girls'].forEach(g=>{if(tags.includes(g))$('#pfGender').value=g});
                 $('#productModal').classList.add('show');
-            });
-        });
-    }
-
-    function addProductToPage(data){
-        const grid=$('#productsGrid');
-        const tag=data.cat+' '+data.gender+' new';
-        const colors={baby:'#fef3e2',toddler:'#e3f2fd',kids:'#fce4ec',junior:'#e8eaf6'};
-        const shapes={baby:'baby-shape',toddler:'toddler-shape',kids:'kids-shape',junior:'junior-shape'};
-        const catLabels={baby:'مواليد',toddler:'صغار',kids:'أطفال',junior:'كبار'};
-        const genderLabels={boys:'ولاد',girls:'بنات'};
-        const article=document.createElement('article');
-        article.className='product';
-        article.dataset.tags=tag;
-        const bg=colors[data.cat]||'#f2f2f2';
-        const shape=shapes[data.cat]||'kids-shape';
-        let imgHTML='';
-        if(data.image){imgHTML='<img src="'+data.image+'" alt="'+data.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">'}
-        else{imgHTML='<div class="product-shape '+shape+'"></div>'}
-        let oldHTML=data.oldPrice?'<span class="old">'+data.oldPrice+'</span>':'';
-        article.innerHTML='<div class="product-img" style="background:'+bg+';" data-img="'+data.image+'">'+imgHTML+'<button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button></div><div class="product-body"><span class="product-cat">'+catLabels[data.cat]+' · '+genderLabels[data.gender]+'</span><h4>'+data.name+'</h4><div class="price-row"><span class="price">'+data.price+'</span>'+oldHTML+'</div><div class="product-actions"><button class="btn-add-cart">أضف للسلة</button><button class="btn-buy-now">اشتري الآن</button></div></div>';
-        grid.appendChild(article);
-
-        article.querySelector('.btn-add-cart').addEventListener('click',e=>{e.preventDefault();openModal(article,false)});
-        article.querySelector('.btn-buy-now').addEventListener('click',e=>{e.preventDefault();openModal(article,true)});
-        article.querySelector('.fav-btn').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();article.querySelector('.fav-btn').classList.toggle('active');toast(article.querySelector('.fav-btn').classList.contains('active')?'تمت الإضافة للمفضلة ♥':'تمت الإزالة من المفضلة')});
-    }
-
-    $('#addProductBtn').addEventListener('click',()=>{
-        editingIdx=null;
-        $('#productModalTitle').textContent='إضافة منتج جديد';
-        $('#pfSubmit').textContent='إضافة المنتج';
-        $('#productForm').reset();
-        $('#productModal').classList.add('show');
-    });
-    $('#productModalClose').addEventListener('click',()=>$('#productModal').classList.remove('show'));
-    $('#productModal').addEventListener('click',e=>{if(e.target===$('#productModal'))$('#productModal').classList.remove('show')});
-
-    $('#productForm').addEventListener('submit',e=>{
-        e.preventDefault();
-        const data={
-            image:$('#pfImage').value.trim(),
-            name:$('#pfName').value.trim(),
-            cat:$('#pfCategory').value,
-            gender:$('#pfGender').value,
-            price:$('#pfPrice').value.trim(),
-            oldPrice:$('#pfOldPrice').value.trim()
-        };
-        if(editingIdx!==null){
-            const p=$$('.product')[editingIdx];
-            if(p){
-                p.querySelector('h4').textContent=data.name;
-                p.querySelector('.price').textContent=data.price;
-                p.querySelector('.product-cat').textContent=(catMap[data.cat]||'')+({'boys':'ولاد','girls':'بنات'}[data.gender]);
-                const imgEl=p.querySelector('.product-img');
-                if(data.image){
-                    imgEl.innerHTML='<img src="'+data.image+'" alt="'+data.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">';
-                    imgEl.dataset.img=data.image;
-                }
-                const oldEl=p.querySelector('.old');
-                if(data.oldPrice){
-                    if(oldEl){oldEl.textContent=data.oldPrice}else{const sp=document.createElement('span');sp.className='old';sp.textContent=data.oldPrice;p.querySelector('.price-row').appendChild(sp)}
-                }else if(oldEl){oldEl.remove()}
-                p.dataset.tags=data.cat+' '+data.gender;
-                toast('تم تعديل المنتج ✓');
-            }
-        }else{
-            addProductToPage(data);
-            toast('تمت إضافة المنتج ✓');
-        }
-        $('#productModal').classList.remove('show');
-        renderAdminProducts(currentAdminFilter);
-        $('#statProducts').textContent=$$('.product').length;
-    });
-
-    // AUTH MODAL
-    const authOverlay=$('#authOverlay');
-    const adminOverlay=$('#adminOverlay');
-    let isAdmin=false;
-
-    $('#loginToggle').addEventListener('click',()=>authOverlay.classList.add('show'));
-    $('#authClose').addEventListener('click',()=>authOverlay.classList.remove('show'));
-    authOverlay.addEventListener('click',e=>{if(e.target===authOverlay)authOverlay.classList.remove('show')});
-
-    $$('.auth-tab').forEach(tab=>{
-        tab.addEventListener('click',()=>{
-            $$('.auth-tab').forEach(t=>t.classList.remove('active'));
-            tab.classList.add('active');
-            const t=tab.dataset.tab;
-            $('#loginForm').classList.toggle('hidden',t!=='login');
-            $('#registerForm').classList.toggle('hidden',t!=='register');
-        });
-    });
-
-    function renderAdminProducts(filter){
-        const list=$('#adminProductsList');
-        list.innerHTML='';
-        const all=$$('.product');
-        let count=0;
-        all.forEach((p,i)=>{
-            const tags=p.dataset.tags||'';
-            if(filter!=='all'&&!tags.includes(filter))return;
-            count++;
-            const name=p.querySelector('h4').textContent;
-            const cat=p.querySelector('.product-cat').textContent;
-            const price=p.querySelector('.price').textContent;
-            const div=document.createElement('div');
-            div.className='admin-product-item';
-            div.innerHTML='<div class="admin-product-info"><h4>'+name+'</h4><span>'+cat+' · '+price+'</span></div><div class="admin-product-actions"><button class="admin-del-btn" data-idx="'+i+'">حذف</button></div>';
-            list.appendChild(div);
-        });
-        if(count===0)list.innerHTML='<div class="admin-empty">لا توجد منتجات في هذا القسم</div>';
-        list.querySelectorAll('.admin-del-btn').forEach(btn=>{
-            btn.addEventListener('click',()=>{
-                const idx=parseInt(btn.dataset.idx);
-                const target=all[idx];
-                if(target){
-                    target.style.opacity='0';target.style.transform='scale(.9)';target.style.transition='all .3s';
-                    setTimeout(()=>{target.remove();renderAdminProducts(filter);$('#statProducts').textContent=$$('.product').length;toast('تم حذف المنتج')},300);
-                }
             });
         });
     }
@@ -553,17 +517,14 @@
                 ordersList.appendChild(div);
             });
         }
-
         adminOverlay.classList.add('show');
     }
 
     $('#adminClose').addEventListener('click',()=>adminOverlay.classList.remove('show'));
     adminOverlay.addEventListener('click',e=>{if(e.target===adminOverlay)adminOverlay.classList.remove('show')});
     $('#adminLogout').addEventListener('click',()=>{
-        isAdmin=false;
         adminOverlay.classList.remove('show');
         toast('تم تسجيل الخروج');
-        $('#loginToggle').style.opacity='1';
     });
 
     $('#loginForm').addEventListener('submit',e=>{
@@ -571,7 +532,6 @@
         const email=e.target.querySelector('input[type="email"]').value.trim();
         const pass=e.target.querySelector('input[type="password"]').value.trim();
         if(email==='sasa@gmail.com'&&pass==='sasa1234'){
-            isAdmin=true;
             toast('مرحبًا المدير! 👑');
             authOverlay.classList.remove('show');
             openAdmin();
@@ -585,6 +545,72 @@
         authOverlay.classList.remove('show');
     });
 
+    // ADD / EDIT PRODUCT
+    $('#addProductBtn').addEventListener('click',()=>{
+        editingIdx=null;
+        $('#productModalTitle').textContent='إضافة منتج جديد';
+        $('#pfSubmit').textContent='إضافة المنتج';
+        $('#productForm').reset();
+        $('#productModal').classList.add('show');
+    });
+    $('#productModalClose').addEventListener('click',()=>$('#productModal').classList.remove('show'));
+    $('#productModal').addEventListener('click',e=>{if(e.target===$('#productModal'))$('#productModal').classList.remove('show')});
+
+    $('#productForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const data={
+            image:$('#pfImage').value.trim(),
+            name:$('#pfName').value.trim(),
+            cat:$('#pfCategory').value,
+            gender:$('#pfGender').value,
+            price:$('#pfPrice').value.trim(),
+            oldPrice:$('#pfOldPrice').value.trim()
+        };
+        if(editingIdx!==null){
+            const p=$$('.product')[editingIdx];
+            if(p){
+                p.querySelector('h4').textContent=data.name;
+                p.querySelector('.price').textContent=data.price;
+                p.querySelector('.product-cat').textContent=(catMap[data.cat]||'')+genderLabels[data.gender];
+                p.dataset.tags=data.cat+' '+data.gender;
+                const imgEl=p.querySelector('.product-img');
+                if(data.image){
+                    imgEl.innerHTML='<img src="'+data.image+'" alt="'+data.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">';
+                    imgEl.dataset.img=data.image;
+                }
+                const oldEl=p.querySelector('.old');
+                if(data.oldPrice){
+                    if(oldEl)oldEl.textContent=data.oldPrice;
+                    else{const sp=document.createElement('span');sp.className='old';sp.textContent=data.oldPrice;p.querySelector('.price-row').appendChild(sp)}
+                }else if(oldEl){oldEl.remove()}
+                toast('تم تعديل المنتج ✓');
+            }
+        }else{
+            const card=buildProductCard(data);
+            $('#productsGrid').appendChild(card);
+            attachProductEvents(card);
+            toast('تمت إضافة المنتج ✓');
+        }
+        saveProducts();
+        $('#productModal').classList.remove('show');
+        renderAdminProducts(currentAdminFilter);
+        $('#statProducts').textContent=$$('.product').length;
+    });
+
+    // ESC
+    document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+            searchPanel.classList.remove('open');
+            mobileNav.classList.remove('open');
+            overlay.classList.remove('show');
+            closeCartFn();
+            $('#modalOverlay').classList.remove('show');
+            authOverlay.classList.remove('show');
+            adminOverlay.classList.remove('show');
+            $('#productModal').classList.remove('show');
+        }
+    });
+
     // SMOOTH SCROLL
     $$('a[href^="#"]').forEach(a=>{
         a.addEventListener('click',e=>{
@@ -594,4 +620,8 @@
             if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});mobileNav.classList.remove('open');overlay.classList.remove('show')}
         });
     });
+
+    // INIT
+    renderAllProducts();
+    observeElements();
 })();
