@@ -1,6 +1,7 @@
 (()=>{
     const $=s=>document.querySelector(s);
     const $$=s=>document.querySelectorAll(s);
+    const API='/api/products';
 
     // SPLASH
     const splash=$('#splash');
@@ -17,7 +18,6 @@
     },3800);
     document.body.style.overflow='hidden';
 
-    // TOAST
     function toast(msg){
         const t=$('#toast');
         t.textContent=msg;
@@ -25,69 +25,49 @@
         setTimeout(()=>t.classList.remove('show'),2200);
     }
 
-    // MOBILE NAV
     const mobileNav=$('#mobileNav');
     const overlay=$('#overlay');
     $('#menuToggle').onclick=()=>{mobileNav.classList.add('open');overlay.classList.add('show')};
     $('#closeMobile').onclick=()=>{mobileNav.classList.remove('open');overlay.classList.remove('show')};
     overlay.onclick=()=>{mobileNav.classList.remove('open');overlay.classList.remove('show')};
 
-    // SEARCH
     const searchPanel=$('#searchPanel');
     const searchInput=$('#searchInput');
     $('#searchToggle').onclick=()=>{searchPanel.classList.add('open');setTimeout(()=>searchInput.focus(),300)};
     $('#closeSearch').onclick=()=>searchPanel.classList.remove('open');
 
-    // ARABIC TO ENGLISH
     function arToEn(s){return s.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))}
 
-    // ===== PRODUCTS STORAGE =====
-    const LS_KEY='sasa_products';
     const catMap={baby:'مواليد · ',toddler:'صغار · ',kids:'أطفال · ',junior:'كبار · '};
     const catLabels={baby:'مواليد',toddler:'صغار',kids:'أطفال',junior:'كبار'};
     const genderLabels={boys:'ولاد',girls:'بنات'};
     const bgColors={baby:'#fef3e2',toddler:'#e3f2fd',kids:'#fce4ec',junior:'#e8eaf6',default:'#f2f2f2'};
     const shapeMap={baby:'baby-shape',toddler:'toddler-shape',kids:'kids-shape',junior:'junior-shape'};
 
-    function getDefaultProducts(){
-        return [
-            {name:'طقم تيشيرت وشورت',cat:'baby',gender:'girls',price:'٢٥٠ ج.م',oldPrice:'٣٥٠ ج.م',image:'',tags:'baby girls'},
-            {name:'سويت شيرت كامل',cat:'toddler',gender:'boys',price:'٣٨٠ ج.م',oldPrice:'',image:'',tags:'toddler boys'},
-            {name:'فستان كاجوال',cat:'kids',gender:'girls',price:'٤٢٠ ج.م',oldPrice:'',image:'',tags:'kids girls'},
-            {name:'طقم تيشيرت وبنطلون رياضي',cat:'kids',gender:'boys',price:'٣٥٠ ج.م',oldPrice:'٤٥٠ ج.م',image:'',tags:'kids boys'},
-            {name:'بليزر كاجوال',cat:'junior',gender:'boys',price:'٥٥٠ ج.م',oldPrice:'',image:'',tags:'junior boys'},
-            {name:'هودي أوفررايزد',cat:'junior',gender:'girls',price:'٤٨٠ ج.م',oldPrice:'',image:'',tags:'junior girls'},
-            {name:'بيجامة قطن مطبوعة',cat:'baby',gender:'boys',price:'١٨٠ ج.م',oldPrice:'',image:'',tags:'baby boys'},
-            {name:'طقم فستان وبادي',cat:'toddler',gender:'girls',price:'٣٢٠ ج.م',oldPrice:'٤٢٠ ج.م',image:'',tags:'toddler girls'}
-        ];
-    }
+    let allProductsData=[];
 
-    function loadProducts(){
+    async function fetchProducts(){
         try{
-            const stored=localStorage.getItem(LS_KEY);
-            if(stored)return JSON.parse(stored);
-        }catch(e){}
-        return getDefaultProducts();
+            const res=await fetch(API);
+            allProductsData=await res.json();
+        }catch(e){
+            allProductsData=[];
+        }
+        return allProductsData;
     }
 
-    function saveProducts(){
-        const grid=$('#productsGrid');
-        const products=[];
-        grid.querySelectorAll('.product').forEach(p=>{
-            const name=p.querySelector('h4').textContent;
-            const catText=p.querySelector('.product-cat').textContent;
-            const price=p.querySelector('.price').textContent;
-            const oldEl=p.querySelector('.old');
-            const oldPrice=oldEl?oldEl.textContent:'';
-            const imgEl=p.querySelector('.product-img');
-            const image=imgEl?imgEl.dataset.img||'':'';
-            const tags=p.dataset.tags||'';
-            let cat='kids',gender='boys';
-            ['baby','toddler','kids','junior'].forEach(c=>{if(tags.includes(c))cat=c});
-            ['boys','girls'].forEach(g=>{if(tags.includes(g))gender=g});
-            products.push({name,cat,gender,price,oldPrice,image,tags});
-        });
-        try{localStorage.setItem(LS_KEY,JSON.stringify(products))}catch(e){}
+    async function apiAddProduct(data){
+        const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        return await res.json();
+    }
+
+    async function apiUpdateProduct(id,data){
+        const res=await fetch(API+'/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        return await res.json();
+    }
+
+    async function apiDeleteProduct(id){
+        await fetch(API+'/'+id,{method:'DELETE'});
     }
 
     function buildProductCard(p){
@@ -96,6 +76,7 @@
         const article=document.createElement('article');
         article.className='product';
         article.dataset.tags=p.cat+' '+p.gender;
+        article.dataset.pid=p.id;
         let imgHTML='';
         if(p.image){imgHTML='<img src="'+p.image+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">'}
         else{imgHTML='<div class="product-shape '+shape+'"></div>'}
@@ -104,11 +85,12 @@
         return article;
     }
 
-    function renderAllProducts(){
+    async function renderAllProducts(){
         const grid=$('#productsGrid');
+        grid.innerHTML='<div class="loading-text">جاري التحميل...</div>';
+        await fetchProducts();
         grid.innerHTML='';
-        const stored=loadProducts();
-        stored.forEach(p=>{
+        allProductsData.forEach(p=>{
             const card=buildProductCard(p);
             grid.appendChild(card);
             attachProductEvents(card);
@@ -119,14 +101,8 @@
     function attachProductEvents(card){
         card.querySelector('.btn-add-cart').addEventListener('click',e=>{e.preventDefault();openModal(card,false)});
         card.querySelector('.btn-buy-now').addEventListener('click',e=>{e.preventDefault();openModal(card,true)});
-        card.querySelector('.fav-btn').addEventListener('click',e=>{
-            e.preventDefault();e.stopPropagation();
-            card.querySelector('.fav-btn').classList.toggle('active');
-            toast(card.querySelector('.fav-btn').classList.contains('active')?'تمت الإضافة للمفضلة ♥':'تمت الإزالة من المفضلة');
-        });
     }
 
-    // FILTER
     let activeFilter='all';
     function attachFilterEvents(){
         $$('.pill').forEach(pill=>{
@@ -150,7 +126,6 @@
         });
     }
 
-    // AGE CARDS -> FILTER PRODUCTS
     $$('.age-card').forEach(card=>{
         card.addEventListener('click',e=>{
             e.preventDefault();
@@ -160,7 +135,6 @@
         });
     });
 
-    // WISHLIST
     document.addEventListener('click',e=>{
         const fav=e.target.closest('.fav-btn');
         if(fav){
@@ -351,15 +325,10 @@
         let msg='*مرحبًا! أنا مهتم بمنتجات SASA - اجيال كيدز* 👋\n━━━━━━━━━━━━━━━━━━━━\n\n';
         msg+='*🛒 المنتجات المتاحة:*\n\n';
         let i=1;
-        $$('.product').forEach(p=>{
-            const name=p.querySelector('h4').textContent;
-            const cat=p.querySelector('.product-cat').textContent;
-            const price=p.querySelector('.price').textContent;
-            const oldEl=p.querySelector('.old');
-            const old=oldEl?' (كان '+oldEl.textContent+')':'';
-            msg+=i+'. '+name+'\n';
-            msg+='   الفئة: '+cat+'\n';
-            msg+='   السعر: '+price+old+'\n\n';
+        allProductsData.forEach(p=>{
+            msg+=i+'. '+p.name+'\n';
+            msg+='   الفئة: '+(catMap[p.cat]||'')+genderLabels[p.gender]+'\n';
+            msg+='   السعر: '+p.price+(p.oldPrice?' (كان '+p.oldPrice+')':'')+'\n\n';
             i++;
         });
         msg+='━━━━━━━━━━━━━━━━━━━━\n';
@@ -415,62 +384,53 @@
     });
 
     let currentAdminFilter='all';
-    let editingIdx=null;
+    let editingId=null;
 
-    function renderAdminProducts(filter){
+    async function renderAdminProducts(filter){
         currentAdminFilter=filter;
+        await fetchProducts();
         const list=$('#adminProductsList');
         list.innerHTML='';
-        const all=$$('.product');
         let count=0;
-        all.forEach((p,i)=>{
-            const tags=p.dataset.tags||'';
-            if(filter!=='all'&&!tags.includes(filter))return;
+        allProductsData.forEach(p=>{
+            if(filter!=='all'&&p.cat!==filter)return;
             count++;
-            const name=p.querySelector('h4').textContent;
-            const cat=p.querySelector('.product-cat').textContent;
-            const price=p.querySelector('.price').textContent;
+            const catLabel=(catMap[p.cat]||'')+genderLabels[p.gender];
             const div=document.createElement('div');
             div.className='admin-product-item';
-            div.innerHTML='<div class="admin-product-info"><h4>'+name+'</h4><span>'+cat+' · '+price+'</span></div><div class="admin-product-actions"><button class="admin-edit-btn" data-idx="'+i+'">تعديل</button><button class="admin-del-btn" data-idx="'+i+'">حذف</button></div>';
+            div.innerHTML='<div class="admin-product-info"><h4>'+p.name+'</h4><span>'+catLabel+' · '+p.price+'</span></div><div class="admin-product-actions"><button class="admin-edit-btn" data-id="'+p.id+'">تعديل</button><button class="admin-del-btn" data-id="'+p.id+'">حذف</button></div>';
             list.appendChild(div);
         });
         if(count===0)list.innerHTML='<div class="admin-empty">لا توجد منتجات في هذا القسم</div>';
 
         list.querySelectorAll('.admin-del-btn').forEach(btn=>{
-            btn.addEventListener('click',()=>{
-                const idx=parseInt(btn.dataset.idx);
-                const target=all[idx];
-                if(target){
-                    target.style.opacity='0';target.style.transform='scale(.9)';target.style.transition='all .3s';
-                    setTimeout(()=>{
-                        target.remove();
-                        saveProducts();
-                        renderAdminProducts(currentAdminFilter);
-                        $('#statProducts').textContent=$$('.product').length;
-                        toast('تم حذف المنتج');
-                    },300);
-                }
+            btn.addEventListener('click',async()=>{
+                const id=parseInt(btn.dataset.id);
+                const item=btn.closest('.admin-product-item');
+                item.style.opacity='0';item.style.transition='all .3s';
+                await apiDeleteProduct(id);
+                toast('تم حذف المنتج');
+                renderAdminProducts(currentAdminFilter);
+                $('#statProducts').textContent=allProductsData.length;
+                await renderAllProducts();
+                observeElements();
             });
         });
 
         list.querySelectorAll('.admin-edit-btn').forEach(btn=>{
             btn.addEventListener('click',()=>{
-                const idx=parseInt(btn.dataset.idx);
-                const p=all[idx];
-                editingIdx=idx;
+                const id=parseInt(btn.dataset.id);
+                const p=allProductsData.find(x=>x.id===id);
+                if(!p)return;
+                editingId=id;
                 $('#productModalTitle').textContent='تعديل المنتج';
                 $('#pfSubmit').textContent='حفظ التعديلات';
-                $('#pfName').value=p.querySelector('h4').textContent;
-                const priceText=p.querySelector('.price').textContent;
-                $('#pfPrice').value=priceText;
-                const oldEl=p.querySelector('.old');
-                $('#pfOldPrice').value=oldEl?oldEl.textContent:'';
-                const imgEl=p.querySelector('.product-img');
-                $('#pfImage').value=imgEl?imgEl.dataset.img||'':'';
-                const tags=p.dataset.tags||'';
-                ['baby','toddler','kids','junior'].forEach(c=>{if(tags.includes(c))$('#pfCategory').value=c});
-                ['boys','girls'].forEach(g=>{if(tags.includes(g))$('#pfGender').value=g});
+                $('#pfName').value=p.name;
+                $('#pfPrice').value=p.price;
+                $('#pfOldPrice').value=p.oldPrice||'';
+                $('#pfImage').value=p.image||'';
+                $('#pfCategory').value=p.cat;
+                $('#pfGender').value=p.gender;
                 $('#productModal').classList.add('show');
             });
         });
@@ -485,7 +445,7 @@
             const q=parseInt(item.querySelector('.qty-num').textContent);
             revenue+=(isNaN(p)?0:p)*q;
         });
-        $('#statProducts').textContent=$$('.product').length;
+        $('#statProducts').textContent=allProductsData.length;
         $('#statOrders').textContent=totalOrders;
         $('#statRevenue').textContent=revenue.toLocaleString('ar-EG')+' ج.م';
 
@@ -547,7 +507,7 @@
 
     // ADD / EDIT PRODUCT
     $('#addProductBtn').addEventListener('click',()=>{
-        editingIdx=null;
+        editingId=null;
         $('#productModalTitle').textContent='إضافة منتج جديد';
         $('#pfSubmit').textContent='إضافة المنتج';
         $('#productForm').reset();
@@ -556,45 +516,29 @@
     $('#productModalClose').addEventListener('click',()=>$('#productModal').classList.remove('show'));
     $('#productModal').addEventListener('click',e=>{if(e.target===$('#productModal'))$('#productModal').classList.remove('show')});
 
-    $('#productForm').addEventListener('submit',e=>{
+    $('#productForm').addEventListener('submit',async e=>{
         e.preventDefault();
         const data={
-            image:$('#pfImage').value.trim(),
             name:$('#pfName').value.trim(),
             cat:$('#pfCategory').value,
             gender:$('#pfGender').value,
             price:$('#pfPrice').value.trim(),
-            oldPrice:$('#pfOldPrice').value.trim()
+            oldPrice:$('#pfOldPrice').value.trim(),
+            image:$('#pfImage').value.trim()
         };
-        if(editingIdx!==null){
-            const p=$$('.product')[editingIdx];
-            if(p){
-                p.querySelector('h4').textContent=data.name;
-                p.querySelector('.price').textContent=data.price;
-                p.querySelector('.product-cat').textContent=(catMap[data.cat]||'')+genderLabels[data.gender];
-                p.dataset.tags=data.cat+' '+data.gender;
-                const imgEl=p.querySelector('.product-img');
-                if(data.image){
-                    imgEl.innerHTML='<img src="'+data.image+'" alt="'+data.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">';
-                    imgEl.dataset.img=data.image;
-                }
-                const oldEl=p.querySelector('.old');
-                if(data.oldPrice){
-                    if(oldEl)oldEl.textContent=data.oldPrice;
-                    else{const sp=document.createElement('span');sp.className='old';sp.textContent=data.oldPrice;p.querySelector('.price-row').appendChild(sp)}
-                }else if(oldEl){oldEl.remove()}
-                toast('تم تعديل المنتج ✓');
-            }
+        if(editingId!==null){
+            await apiUpdateProduct(editingId,data);
+            toast('تم تعديل المنتج ✓');
         }else{
-            const card=buildProductCard(data);
-            $('#productsGrid').appendChild(card);
-            attachProductEvents(card);
+            await apiAddProduct(data);
             toast('تمت إضافة المنتج ✓');
         }
-        saveProducts();
+        editingId=null;
         $('#productModal').classList.remove('show');
+        await renderAllProducts();
+        observeElements();
         renderAdminProducts(currentAdminFilter);
-        $('#statProducts').textContent=$$('.product').length;
+        $('#statProducts').textContent=allProductsData.length;
     });
 
     // ESC
@@ -622,6 +566,5 @@
     });
 
     // INIT
-    renderAllProducts();
-    observeElements();
+    renderAllProducts().then(()=>observeElements());
 })();
