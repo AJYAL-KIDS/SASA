@@ -218,8 +218,8 @@ button{border:none;background:none;cursor:pointer;font-family:inherit}
 .pill:hover{color:var(--dark);border-color:var(--dark)}
 .pill.active{color:#fff;background:var(--pri);border-color:var(--pri)}
 
-.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem 1rem}
-.product{transition:opacity .3s,transform .3s}
+.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem 1.2rem}
+.product{transition:opacity .3s,transform .3s;background:#fff;border:1px solid #eee;border-radius:var(--radius);overflow:hidden;padding:.6rem;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .product.hidden{display:none}
 
 .product-img{
