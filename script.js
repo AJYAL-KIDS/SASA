@@ -75,7 +75,7 @@
 
     async function saveToCloud(products){
         try{
-            const data=JSON.stringify({record:{products}});
+            const data=JSON.stringify({products});
             const res=await fetch('https://api.jsonbin.io/v3/b/'+FB_BIN,{
                 method:'PUT',
                 headers:{'Content-Type':'application/json','X-Master-Key':FB_KEY},
@@ -91,8 +91,10 @@
                 headers:{'X-Master-Key':FB_KEY}
             });
             const json=await res.json();
-            if(json.record&&json.record.products)return json.record.products;
-            if(json.record&&Array.isArray(json.record))return json.record;
+            const rec=json.record||json;
+            if(rec&&rec.products&&rec.products.length)return rec.products;
+            if(rec&&rec.record&&rec.record.products&&rec.record.products.length)return rec.record.products;
+            if(Array.isArray(rec))return rec;
         }catch(e){}
         return null;
     }
@@ -110,7 +112,7 @@
     async function saveProducts(){
         const products=getProductsFromDOM();
         try{localStorage.setItem(LS_KEY,JSON.stringify(products))}catch(e){}
-        await saveToCloud(products);
+        saveToCloud(products).catch(()=>{});
     }
 
     function buildProductCard(p){
