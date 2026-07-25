@@ -43,6 +43,8 @@
 
     // ===== PRODUCTS STORAGE =====
     const LS_KEY='sasa_products';
+    const FB_KEY='$2a$10$EMiyukg2sO/MV/9EfuGbjuN7MMApqW2s1HHJEpS/J/2AoE.h8bzMi';
+    const FB_BIN='6a64b209f5f4af5e29bfa52f';
     const catMap={baby:'مواليد · ',toddler:'صغار · ',kids:'أطفال · ',junior:'كبار · '};
     const catLabels={baby:'مواليد',toddler:'صغار',kids:'أطفال',junior:'كبار'};
     const genderLabels={boys:'ولاد',girls:'بنات'};
@@ -53,18 +55,9 @@
         return window.PRODUCTS_DEFAULT || [];
     }
 
-    function loadProducts(){
-        try{
-            const stored=localStorage.getItem(LS_KEY);
-            if(stored)return JSON.parse(stored);
-        }catch(e){}
-        return getDefaultProducts();
-    }
-
-    function saveProducts(){
-        const grid=$('#productsGrid');
+    function getProductsFromDOM(){
         const products=[];
-        grid.querySelectorAll('.product').forEach(p=>{
+        $$('#productsGrid .product').forEach(p=>{
             const name=p.querySelector('h4').textContent;
             const price=p.querySelector('.price').textContent;
             const oldEl=p.querySelector('.old');
@@ -77,7 +70,47 @@
             ['boys','girls'].forEach(g=>{if(tags.includes(g))gender=g});
             products.push({name,cat,gender,price,oldPrice,image,tags});
         });
+        return products;
+    }
+
+    async function saveToCloud(products){
+        try{
+            const data=JSON.stringify({record:{products}});
+            const res=await fetch('https://api.jsonbin.io/v3/b/'+FB_BIN,{
+                method:'PUT',
+                headers:{'Content-Type':'application/json','X-Master-Key':FB_KEY},
+                body:data
+            });
+            return res.ok;
+        }catch(e){return false}
+    }
+
+    async function loadFromCloud(){
+        try{
+            const res=await fetch('https://api.jsonbin.io/v3/b/'+FB_BIN+'/latest',{
+                headers:{'X-Master-Key':FB_KEY}
+            });
+            const json=await res.json();
+            if(json.record&&json.record.products)return json.record.products;
+            if(json.record&&Array.isArray(json.record))return json.record;
+        }catch(e){}
+        return null;
+    }
+
+    async function loadProducts(){
+        try{
+            const stored=localStorage.getItem(LS_KEY);
+            if(stored)return JSON.parse(stored);
+        }catch(e){}
+        const cloud=await loadFromCloud();
+        if(cloud&&cloud.length){localStorage.setItem(LS_KEY,JSON.stringify(cloud));return cloud}
+        return getDefaultProducts();
+    }
+
+    async function saveProducts(){
+        const products=getProductsFromDOM();
         try{localStorage.setItem(LS_KEY,JSON.stringify(products))}catch(e){}
+        await saveToCloud(products);
     }
 
     function buildProductCard(p){
@@ -94,10 +127,10 @@
         return article;
     }
 
-    function renderAllProducts(){
+    async function renderAllProducts(){
         const grid=$('#productsGrid');
         grid.innerHTML='';
-        const stored=loadProducts();
+        const stored=await loadProducts();
         stored.forEach(p=>{
             const card=buildProductCard(p);
             grid.appendChild(card);
@@ -541,7 +574,7 @@
     $('#productModalClose').addEventListener('click',()=>$('#productModal').classList.remove('show'));
     $('#productModal').addEventListener('click',e=>{if(e.target===$('#productModal'))$('#productModal').classList.remove('show')});
 
-    $('#productForm').addEventListener('submit',e=>{
+    $('#productForm').addEventListener('submit',async e=>{
         e.preventDefault();
         const data={
             image:$('#pfImage').value.trim(),
@@ -607,6 +640,5 @@
     });
 
     // INIT
-    renderAllProducts();
-    observeElements();
+    renderAllProducts().then(()=>observeElements());
 })();
