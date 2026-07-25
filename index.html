@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SASA - اجيال كيدز</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="splash" id="splash">
+        <div class="splash-bg">
+            <div class="dot dot-1"></div>
+            <div class="dot dot-2"></div>
+            <div class="dot dot-3"></div>
+            <div class="dot dot-4"></div>
+            <div class="dot dot-5"></div>
+            <div class="dot dot-6"></div>
+            <div class="dot dot-7"></div>
+            <div class="dot dot-8"></div>
+            <div class="particle p1"></div>
+            <div class="particle p2"></div>
+            <div class="particle p3"></div>
+            <div class="particle p4"></div>
+            <div class="particle p5"></div>
+            <div class="particle p6"></div>
+            <div class="particle p7"></div>
+            <div class="particle p8"></div>
+            <div class="particle p9"></div>
+            <div class="particle p10"></div>
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+        </div>
+        <div class="splash-content">
+            <div class="splash-letters" dir="ltr">
+                <span class="splash-letter">S</span>
+                <span class="splash-letter">A</span>
+                <span class="splash-letter">S</span>
+                <span class="splash-letter">A</span>
+            </div>
+            <div class="splash-sub">
+                <span class="splash-sub-text">اجيال كيدز</span>
+            </div>
+            <div class="splash-tagline">ملابس أطفال بأسلوب عصري</div>
+        </div>
+        <div class="splash-footer">
+            <div class="splash-dots">
+                <span class="sdot"></span><span class="sdot"></span><span class="sdot"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="site" id="site">
+
+        <header class="header">
+            <div class="header-inner">
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span><span></span><span></span>
+                </button>
+                <a href="#" class="brand">
+                    <span class="brand-name">SASA</span>
+                    <span class="brand-sub">اجيال كيدز</span>
+                </a>
+                <nav class="nav">
+                    <a href="#ages">حسب العمر</a>
+                    <a href="#new">وصل حديثاً</a>
+                    <a href="#sale">عروض</a>
+                    <a href="#" class="nav-wa" id="contactUs">تواصل معنا</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="icon-btn" id="searchToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </button>
+                    <button class="icon-btn" id="loginToggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </button>
+                    <button class="icon-btn cart-trigger">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                        <span class="cart-badge" id="cartBadge">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="mobile-nav" id="mobileNav">
+            <div class="mobile-nav-head">
+                <span class="brand-name small">SASA</span>
+                <button class="close-mobile" id="closeMobile">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <nav class="mobile-nav-links">
+                <a href="#ages">حسب العمر</a>
+                <a href="#new">وصل حديثاً</a>
+                <a href="#sale">عروض</a>
+                <a href="#" id="contactUsMobile">تواصل معنا</a>
+            </nav>
+        </div>
+        <div class="overlay" id="overlay"></div>
+
+        <div class="search-panel" id="searchPanel">
+            <div class="search-box">
+                <input type="text" placeholder="ابحث عن ملابس أطفال..." id="searchInput">
+                <button class="close-search" id="closeSearch">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Cart Panel -->
+        <div class="cart-panel" id="cartPanel">
+            <div class="cart-panel-inner">
+                <div class="cart-head">
+                    <h3>سلة المشتريات <span class="cart-count-label" id="cartCountLabel">(٠ منتجات)</span></h3>
+                    <button class="close-cart" id="closeCart">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <div class="cart-items" id="cartItems">
+                </div>
+
+                <div class="cart-empty show" id="cartEmpty">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p>السلة فاضية</p>
+                    <span>ابدأ التسوق وضيف منتجات للسلة</span>
+                </div>
+
+                <div class="cart-footer" id="cartFooter" style="display:none">
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>المجموع الفرعي</span>
+                            <span id="subtotal">١,٤٧٠ ج.م</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>الشحن</span>
+                            <span class="shipping-free">مجاني</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>الإجمالي</span>
+                            <span id="totalPrice">١,٤٧٠ ج.م</span>
+                        </div>
+                    </div>
+                    <div class="cart-promo">
+                        <input type="text" placeholder="كود الخصم">
+                        <button>تطبيق</button>
+                    </div>
+                    <button class="checkout-btn" id="checkoutBtn">
+                        إتمام الشراء
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                    <a href="#" class="continue-shopping" id="continueShopping">← متابعة التسوق</a>
+                </div>
+            </div>
+        </div>
+        <div class="cart-overlay" id="cartOverlay"></div>
+
+        <!-- Login / Register Modal -->
+        <div class="auth-overlay" id="authOverlay">
+            <div class="auth-box">
+                <button class="modal-close" id="authClose">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">تسجيل الدخول</button>
+                    <button class="auth-tab" data-tab="register">إنشاء حساب</button>
+                </div>
+
+                <!-- Login Form -->
+                <form class="auth-form" id="loginForm">
+                    <h3>تسجيل الدخول</h3>
+                    <div class="field">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" placeholder="example@email.com" required>
+                    </div>
+                    <div class="field">
+                        <label>كلمة المرور</label>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                    <div class="field-row">
+                        <label class="check-label"><input type="checkbox"> تذكرني</label>
+                    </div>
+                    <button type="submit" class="auth-btn">تسجيل الدخول</button>
+                </form>
+
+                <!-- Register Form -->
+                <form class="auth-form hidden" id="registerForm">
+                    <h3>إنشاء حساب جديد</h3>
+                    <div class="field">
+                        <label>الاسم الكامل</label>
+                        <input type="text" placeholder="اسمك هنا" required>
+                    </div>
+                    <div class="field">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" placeholder="example@email.com" required>
+                    </div>
+                    <div class="field">
+                        <label>كلمة المرور</label>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                    <div class="field">
+                        <label>تأكيد كلمة المرور</label>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="auth-btn">إنشاء حساب</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div class="admin-overlay" id="adminOverlay">
+            <div class="admin-panel">
+                <div class="admin-head">
+                    <h2>لوحة التحكم</h2>
+                    <button class="modal-close" id="adminClose">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <div class="admin-welcome">
+                    <span class="admin-avatar">👑</span>
+                    <div>
+                        <h3>مرحبًا، المدير</h3>
+                        <p>sasa@gmail.com</p>
+                    </div>
+                    <button class="admin-logout" id="adminLogout">تسجيل الخروج</button>
+                </div>
+
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-num" id="statProducts">8</div>
+                        <div class="stat-label">المنتجات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="statOrders">0</div>
+                        <div class="stat-label">الطلبات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="statRevenue">0 ج.م</div>
+                        <div class="stat-label">الإيرادات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="statUsers">1</div>
+                        <div class="stat-label">المستخدمين</div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>الطلبات الأخيرة</h3>
+                    <div class="admin-orders" id="adminOrders">
+                        <div class="admin-empty">لا توجد طلبات بعد</div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <div class="admin-section-head">
+                        <h3>إدارة المنتجات</h3>
+                        <button class="admin-add-btn" id="addProductBtn">+ إضافة منتج</button>
+                    </div>
+                    <div class="admin-cat-tabs">
+                        <button class="admin-cat-tab active" data-acat="all">الكل</button>
+                        <button class="admin-cat-tab" data-acat="baby">مواليد</button>
+                        <button class="admin-cat-tab" data-acat="toddler">صغار</button>
+                        <button class="admin-cat-tab" data-acat="kids">أطفال</button>
+                        <button class="admin-cat-tab" data-acat="junior">كبار</button>
+                    </div>
+                    <div class="admin-products" id="adminProductsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Product Modal -->
+        <div class="modal-overlay" id="productModal">
+            <div class="modal-box">
+                <button class="modal-close" id="productModalClose">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h3 id="productModalTitle">إضافة منتج جديد</h3>
+                <form id="productForm">
+                    <div class="field">
+                        <label>رابط صورة المنتج</label>
+                        <input type="url" id="pfImage" placeholder="https://i.postimg.cc/..." required>
+                    </div>
+                    <div class="field">
+                        <label>اسم المنتج</label>
+                        <input type="text" id="pfName" placeholder="مثال: طقم تيشيرت" required>
+                    </div>
+                    <div class="field">
+                        <label>الفئة</label>
+                        <select id="pfCategory" required>
+                            <option value="baby">مواليد</option>
+                            <option value="toddler">صغار</option>
+                            <option value="kids">أطفال</option>
+                            <option value="junior">كبار</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>الجنس</label>
+                        <select id="pfGender" required>
+                            <option value="boys">ولاد</option>
+                            <option value="girls">بنات</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>السعر</label>
+                        <input type="text" id="pfPrice" placeholder="مثال: ٢٥٠ ج.م" required>
+                    </div>
+                    <div class="field">
+                        <label>السعر القديم (اختياري)</label>
+                        <input type="text" id="pfOldPrice" placeholder="مثال: ٣٥٠ ج.م">
+                    </div>
+                    <button type="submit" class="auth-btn" id="pfSubmit">إضافة المنتج</button>
+                </form>
+            </div>
+        </div>
+
+
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-text">
+                    <div class="hero-badge">عرض خاص - خصم ٢٥٪</div>
+                    <h1>ملابس أطفال<br><span>اجيال كيدز</span></h1>
+                    <p>تشكيلة واسعة من ملابس الأطفال من عمر ٠ لـ ١٢ سنة بجودة عالية وأسعار مناسبة</p>
+                    <a href="#ages" class="btn-primary">تسوق حسب العمر ←</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="age-section" id="ages">
+            <div class="container">
+                <div class="section-head">
+                    <h2>تسوق حسب العمر</h2>
+                    <p>اختار المقاس المناسب لطفلك</p>
+                </div>
+                <div class="age-grid">
+                    <a href="#" class="age-card" data-age="baby">
+                        <div class="age-visual">
+                            <img src="https://i.postimg.cc/Hx297LCh/ee99c6b5f8ec5e0c726e25300d4eacf5tfl.jpg" alt="مواليد" loading="lazy">
+                        </div>
+                        <div class="age-info">
+                            <h3>مواليد</h3>
+                            <div class="age-en">Newborn - 2 Years</div>
+                            <div class="age-line"></div>
+                            <div class="age-sizes">NB · 3M · 6M · 9M · 12M · 18M · 24M</div>
+                        </div>
+                    </a>
+                    <a href="#" class="age-card" data-age="toddler">
+                        <div class="age-visual">
+                            <img src="https://i.postimg.cc/sXZTQz22/1-aly-2.jpg" alt="صغار" loading="lazy">
+                        </div>
+                        <div class="age-info">
+                            <h3>صغار</h3>
+                            <div class="age-en">1 - 2 Years</div>
+                            <div class="age-line"></div>
+                            <div class="age-sizes">2T · 3T · 4T</div>
+                        </div>
+                    </a>
+                    <a href="#" class="age-card" data-age="kids">
+                        <div class="age-visual">
+                            <img src="https://i.postimg.cc/bJbRYR6Z/5.jpg" alt="أطفال" loading="lazy">
+                        </div>
+                        <div class="age-info">
+                            <h3>أطفال</h3>
+                            <div class="age-en">3 - 5 Years</div>
+                            <div class="age-line"></div>
+                            <div class="age-sizes">5Y · 6Y · 7Y</div>
+                        </div>
+                    </a>
+                    <a href="#" class="age-card" data-age="junior">
+                        <div class="age-visual">
+                            <img src="https://i.postimg.cc/FRcxFxPk/8.jpg" alt="كبار" loading="lazy">
+                        </div>
+                        <div class="age-info">
+                            <h3>كبار</h3>
+                            <div class="age-en">6 - 9 Years</div>
+                            <div class="age-line"></div>
+                            <div class="age-sizes">8Y · 10Y · 12Y</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="products-section" id="new">
+            <div class="container">
+                <div class="section-head row">
+                    <div>
+                        <h2>المنتجات المتاحه</h2>
+                        <p>أحدث المنتجات اللي وصلتنا</p>
+                    </div>
+                    <a href="#" class="link-btn">عرض الكل ←</a>
+                </div>
+
+                <div class="filter-row">
+                    <button class="pill active" data-filter="all">الكل</button>
+                    <button class="pill" data-filter="baby">مواليد</button>
+                    <button class="pill" data-filter="toddler">صغار</button>
+                    <button class="pill" data-filter="kids">أطفال ٥-٧</button>
+                    <button class="pill" data-filter="junior">كبار ٨-١٢</button>
+                    <button class="pill" data-filter="boys">ولاد</button>
+                    <button class="pill" data-filter="girls">بنات</button>
+                </div>
+
+                <div class="products-grid" id="productsGrid">
+                    <article class="product" data-tags="baby girls new" data-sizes="3M,6M,9M,12M" data-colors="#ffb6c1:وردي,#fff:أبيض,#ffd700:ذهبي">
+                        <div class="product-img" style="background:#fef3e2;">
+                            <div class="product-shape baby-shape"></div>
+                            <span class="tag-new">جديد</span>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">مواليد · بنات</span>
+                            <h4>طقم تيشيرت وشورت</h4>
+                            <div class="price-row"><span class="price">٢٥٠ ج.م</span><span class="old">٣٥٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="product" data-tags="toddler boys new" data-sizes="2T,3T,4T" data-colors="#2196f3:أزرق,#607d8b:رمادي,#4caf50:أخضر">
+                        <div class="product-img" style="background:#e3f2fd;">
+                            <div class="product-shape toddler-shape"></div>
+                            <span class="tag-new">جديد</span>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">صغار · ولاد</span>
+                            <h4>سويت شيرت كامل</h4>
+                            <div class="price-row"><span class="price">٣٨٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="product" data-tags="kids girls" data-sizes="5Y,6Y,7Y" data-colors="#e91e63:أحمر,#9c27b3:بنفسجي,#ff9800:برتقالي">
+                        <div class="product-img" style="background:#fce4ec;">
+                            <div class="product-shape kids-shape"></div>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">أطفال · بنات</span>
+                            <h4>فستان كاجوال</h4>
+                            <div class="price-row"><span class="price">٤٢٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="product" data-tags="kids boys new" data-sizes="5Y,6Y,7Y" data-colors="#000:أسود,#2196f3:أزرق,#f44336:أحمر غامق">
+                        <div class="product-img" style="background:#e8f5e9;">
+                            <div class="product-shape kids-shape"></div>
+                            <span class="tag-new">جديد</span>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">أطفال · ولاد</span>
+                            <h4>طقم تيشيرت وبنطلون رياضي</h4>
+                            <div class="price-row"><span class="price">٣٥٠ ج.م</span><span class="old">٤٥٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="product" data-tags="junior boys" data-sizes="8Y,10Y,12Y" data-colors="#37474f:كحلي,#1a237e:أزرق غامق">
+                        <div class="product-img" style="background:#e8eaf6;">
+                            <div class="product-shape junior-shape"></div>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">كبار · ولاد</span>
+                            <h4>بليزر كاجوال</h4>
+                            <div class="price-row"><span class="price">٥٥٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="product" data-tags="junior girls new" data-sizes="8Y,10Y,12Y" data-colors="#ce93d8:سماوي,#fff:أبيض,#000:أسود">
+                        <div class="product-img" style="background:#f3e5f5;">
+                            <div class="product-shape junior-shape"></div>
+                            <span class="tag-new">جديد</span>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">كبار · بنات</span>
+                            <h4>هودي أوفررايزد</h4>
+                            <div class="price-row"><span class="price">٤٨٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="product" data-tags="baby boys" data-sizes="3M,6M,9M,12M" data-colors="#bbdefb:سماوي فاتح,#c8e6c9:أخضر فاتح">
+                        <div class="product-img" style="background:#fff3e0;">
+                            <div class="product-shape baby-shape"></div>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">مواليد · ولاد</span>
+                            <h4>بيجامة قطن مطبوعة</h4>
+                            <div class="price-row"><span class="price">١٨٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="product" data-tags="toddler girls" data-sizes="2T,3T,4T" data-colors="#f8bbd0:وردي فاتح,#ffcc80:بيج">
+                        <div class="product-img" style="background:#fce4ec;">
+                            <div class="product-shape toddler-shape"></div>
+                            <button class="fav-btn" aria-label="مفضلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+                        </div>
+                        <div class="product-body">
+                            <span class="product-cat">صغار · بنات</span>
+                            <h4>طقم فستان وبادي</h4>
+                            <div class="price-row"><span class="price">٣٢٠ ج.م</span><span class="old">٤٢٠ ج.م</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart">أضف للسلة</button>
+                                <button class="btn-buy-now">اشتري الآن</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="promo-banner" id="girls">
+            <div class="container">
+                <div class="banner-box">
+                    <div class="banner-text">
+                        <span class="overline">عرض نهاية الموسم</span>
+                        <h2>خصم يصل إلى <strong>٤٠٪</strong></h2>
+                        <p>على جميع ملابس الأطفال - الكمية محدودة</p>
+                    </div>
+                    <div class="banner-visual">
+                        <div class="confetti c1"></div>
+                        <div class="confetti c2"></div>
+                        <div class="confetti c3"></div>
+                        <div class="confetti c4"></div>
+                        <div class="big-emoji">🔥</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="newsletter" id="sale">
+            <div class="container">
+                <div class="nl-box">
+                    <div class="nl-text">
+                        <h2>كون أول من يعرف عن العروض</h2>
+                        <p>سجّل واحصل على خصم ١٥٪ على أول طلب</p>
+                    </div>
+                    <form class="nl-form" id="nlForm">
+                        <input type="email" placeholder="بريدك الإلكتروني" required>
+                        <button type="submit">اشترك</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <div class="features-grid">
+                    <div class="feat">
+                        <div class="feat-icon">🚚</div>
+                        <h4>شحن مجاني</h4>
+                        <p>للطلبات فوق ٥٠٠ ج.م</p>
+                    </div>
+                    <div class="feat">
+                        <div class="feat-icon">🔄</div>
+                        <h4>إرجاع خلال ١٤ يوم</h4>
+                        <p>بدون أي تعقيدات</p>
+                    </div>
+                    <div class="feat">
+                        <div class="feat-icon">💳</div>
+                        <h4>دفع آمن</h4>
+                        <p>فيزا / ماستركارد / عند الاستلام</p>
+                    </div>
+                    <div class="feat">
+                        <div class="feat-icon">💬</div>
+                        <h4>دعم واتساب</h4>
+                        <p>متوفر ٢٤ ساعة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <div class="brand-footer">
+                            <span class="brand-name big">SASA</span>
+                            <span class="brand-sub">اجيال كيدز</span>
+                        </div>
+                        <p>وجهتك الأولى لملابس الأطفال في مصر. جودة عالية، تصميمات عصرية، وأسعار مناسبة.</p>
+                    </div>
+                    <div class="footer-col">
+                        <h4>روابط سريعة</h4>
+                        <a href="#ages">حسب العمر</a>
+                        <a href="#new">وصل حديثاً</a>
+                        <a href="#boys">ولاد</a>
+                        <a href="#girls">بنات</a>
+                        <a href="#sale">عروض</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>خدمة العملاء</h4>
+                        <a href="#">تتبع الطلب</a>
+                        <a href="#">سياسة الإرجاع</a>
+                        <a href="#">الشحن والتوصيل</a>
+                        <a href="#">الأسئلة الشائعة</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>تواصل معنا</h4>
+                        <p>📍 القاهرة، مصر</p>
+                        <p>📞 01234567890</p>
+                        <p>✉️ info@sasa-kids.com</p>
+                        <p>💬 واتساب: 01000000000</p>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>© ٢٠٢٦ SASA اجيال كيدز. جميع الحقوق محفوظة.</p>
+                    <div class="payments">
+                        <span>VISA</span><span>Mastercard</span><span>Apple Pay</span><span>COD</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- Size/Color Selection Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <button class="modal-close" id="modalClose">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="modal-img" id="modalImg">
+                <svg class="tshirt-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M75 15L90 25L80 40L68 35V85H32V35L20 40L10 25L25 15L35 25H65L75 15Z" fill="#F26076" stroke="#d94e63" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M35 25H65" stroke="#d94e63" stroke-width="2"/>
+                    <path d="M32 35L68 35" stroke="#d94e63" stroke-width="1.5" stroke-dasharray="3 2"/>
+                </svg>
+            </div>
+            <h3 id="modalName"></h3>
+            <span class="modal-cat" id="modalCat"></span>
+            <span class="modal-price" id="modalPrice"></span>
+
+            <div class="modal-section">
+                <label>المقاس</label>
+                <input type="text" class="modal-input" id="modalSizeInput" placeholder="مثال: 3M, 5Y, 2T...">
+            </div>
+
+            <div class="modal-section">
+                <label>اللون</label>
+                <input type="text" class="modal-input" id="modalColorInput" placeholder="مثال: أزرق، أحمر، أسود...">
+            </div>
+
+            <button class="modal-add-btn" id="modalAddBtn">
+                أضف للسلة
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
